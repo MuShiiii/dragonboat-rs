@@ -5,9 +5,10 @@ struct Config {
 
     // shard_id 是用于标识包含多个副本的 Raft 组的唯一值。
     shard_id: u64,
-    // check_quorum 指定领导者节点是否应定期检查非领导者节点状态，并在不再拥有法定人数时降级为跟随者节点。
 
+    // check_quorum 指定领导者节点是否应定期检查非领导者节点状态，并在不再拥有法定人数时降级为跟随者节点。
     check_quorum: bool,
+    
     // 是否为这个节点使用预投票（PreVote）。预投票在 Raft 论文的 9.7 节中有描述。
     pre_vote: bool,
 
@@ -42,25 +43,24 @@ struct Config {
     // 当设置为 true 时，成员变更请求需要 ConfigChangeIndex。这表现得像一个乐观写锁，强制客户端明确地线性化成员变更请求。（推荐）
     //
     // 当设置为 false（默认值）时，成员变更请求忽略 ConfigChangeIndex。这可能导致客户端基于过时的成员数据请求成员变更。
-
     ordered_config_change: bool,
+
     // MaxInMemLogSize 是每个 Raft 节点上允许用于存储内存中 Raft 日志的目标大小（以字节为单位）。内存中的 Raft 日志是尚未应用的日志。
     // MaxInMemLogSize 是一个目标值，用于防止内存无限制增长，它不是用于精确限制确切的内存使用量。
     // 当 MaxInMemLogSize 为 0 时，目标设置为 math.MaxUint64。当设置了 MaxInMemLogSize 并且达到目标时，当客户端尝试进行新提案时将返回错误。
     // MaxInMemLogSize 建议设置为比你将要使用的最大提案大得多的值。
-
     max_in_mem_log_size: u64,
+
     // SnapshotCompressionType 是用于压缩生成的快照数据的压缩类型。默认情况下不使用压缩。
-
     snapshot_compression_type: CompressionType,
-    // EntryCompressionType 是用于压缩用户提案的有效负载的压缩类型。当使用 Snappy 时，允许的最大提案有效负载大约限制为 3.42GB。默认情况下不使用压缩。
 
+    // EntryCompressionType 是用于压缩用户提案的有效负载的压缩类型。当使用 Snappy 时，允许的最大提案有效负载大约限制为 3.42GB。默认情况下不使用压缩。
     entry_compression_type: CompressionType,
     
     // DisableAutoCompactions 禁用用于回收 Raft 日志条目存储空间的自动压缩。默认情况下，每次创建快照时都会发出压缩请求，这有助于尽快回收磁盘空间，但代价是立即增加 IO 开销。用户可以禁用这种自动压缩，并在必要时使用 NodeHost.RequestCompaction 手动请求这种压缩。
     disable_auto_compactions: bool,
+
     // IsNonVoting 指示这是否是一个无投票权的 Raft 节点。在 Diego Ongaro 的论文的 4.2.1 节中描述为非投票成员，它们用于允许新节点加入分片并赶上其他现有节点，而不会影响可用性。还可以引入额外的非投票节点来服务只读请求。
-    
     is_non_voting: bool,
    
     // IsWitness 指示这是否是一个见证 Raft 节点，没有实际的日志复制并且没有状态机。在 Diego Ongaro 的论文的 11.7.2 节中提到。
